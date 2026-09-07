@@ -14,7 +14,6 @@ import streamlit as st
 
 st.set_page_config(page_title="Fastfood – wybór i sumy (per portion)", layout="wide")
 
-# --- KONFIG / STAŁe ---
 # --- KONFIG / STAŁE ---
 
 LOCAL_PATH = r"C:\Users\PC\Desktop\Projekty\Tabela wartości\github\fastfood-makros\data\items_kfc.csv"
@@ -70,7 +69,15 @@ def load_csv(path_or_buffer):
         df[PRICE_COL] = pd.to_numeric(s, errors='coerce')
 
     return df
+    
+# --- AUTOMATYCZNE WCZYTANIE DANYCH ---
 
+try:
+    df = load_csv(DEFAULT_PATH)
+except Exception as e:
+    st.error(f"Problem z wczytaniem danych: {e}")
+    st.stop()
+    
 st.title("🍟 Fastfood — wybór produktów i sumy 'per portion'")
 
 # --- STAN GLOBALNY ---
