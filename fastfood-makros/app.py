@@ -89,30 +89,6 @@ def load_csv(path_or_buffer):
 
     return df
 
-# --- SIDEBAR: źródło danych ---
-st.sidebar.header("Źródło danych")
-mode = st.sidebar.radio("Wczytaj dane z:", ["Domyślna ścieżka", "Wskaż plik (przeglądarka)"], horizontal=True)
-
-df, used_source = None, None
-try:
-    if mode == "Domyślna ścieżka":
-        path = st.sidebar.text_input("Ścieżka do CSV", value=DEFAULT_PATH)
-        if path and os.path.exists(path):
-            df = load_csv(path); used_source = path
-        else:
-            st.sidebar.warning("Podana ścieżka nie istnieje. Użyj 'Wskaż plik'.")
-    else:
-        up = st.sidebar.file_uploader("Wgraj CSV (UTF-8, ';')", type=["csv"])
-        if up is not None:
-            df = load_csv(up); used_source = "plik wgrany"
-except Exception as e:
-    st.error(f"Problem z wczytaniem danych: {e}")
-
-if df is None:
-    st.info("➡️ Wskaż CSV po lewej (sidebar), aby kontynuować.")
-    st.stop()
-
-st.sidebar.success(f"Wczytano: {used_source}")
 st.title("🍟 Fastfood — wybór produktów i sumy 'per portion'")
 
 # --- STAN GLOBALNY ---
