@@ -19,6 +19,9 @@ LOCAL_PATH = r"C:\Users\PC\Desktop\Projekty\Tabela wartości\github\fastfood-mak
 CLOUD_PATH = os.path.join("data", "items_kfc.csv")
 
 DEFAULT_PATH = LOCAL_PATH if os.path.exists(LOCAL_PATH) else CLOUD_PATH
+st.write("BASE_DIR:", BASE_DIR)
+st.write("CLOUD_PATH:", CLOUD_PATH)
+st.write("Czy istnieje:", os.path.exists(CLOUD_PATH))
 PRICE_COL = "price_pln"
 
 REQUIRED = [
