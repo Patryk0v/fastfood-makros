@@ -26,24 +26,6 @@ DEFAULT_PATH = LOCAL_PATH if os.path.exists(LOCAL_PATH) else CLOUD_PATH
 
 PRICE_COL = "price_pln"
 
-# --- TEST ŚCIEŻKI ---
-st.write("### TEST ŚCIEŻKI DO CSV")
-st.write("BASE_DIR:", BASE_DIR)
-st.write("LOCAL_PATH:", LOCAL_PATH)
-st.write("Czy LOCAL_PATH istnieje:", os.path.exists(LOCAL_PATH))
-st.write("CLOUD_PATH:", CLOUD_PATH)
-st.write("Czy CLOUD_PATH istnieje:", os.path.exists(CLOUD_PATH))
-st.write("DEFAULT_PATH:", DEFAULT_PATH)
-st.write("Czy DEFAULT_PATH istnieje:", os.path.exists(DEFAULT_PATH))
-
-data_folder = os.path.join(BASE_DIR, "data")
-
-if os.path.exists(data_folder):
-    st.write("Zawartość folderu data:", os.listdir(data_folder))
-else:
-    st.write("Folder data NIE ISTNIEJE")
-PRICE_COL = "price_pln"
-
 REQUIRED = [
     "Kategoria","Produkt","kJ_per_portion","kcal_per_portion",
     "fat_per_portion","kwasy_per_portion","carbs_per_portion",
