@@ -58,15 +58,23 @@ def load_csv(path_or_buffer):
 
     # cena (opcjonalna)
     if PRICE_COL not in df.columns:
-        df[PRICE_COL] = np.nan
-    else:
-        s = df[PRICE_COL].astype(str)
-        s = s.str.replace(',', '.', regex=False)
-        s = s.str.replace(r'[\u00A0\s]', '', regex=True)      # usuń spacje i NBSP
-        s = s.str.replace(r'[^0-9\.\-()]', '', regex=True)    # usuń walutę/symbole
-        s = s.str.replace(r'^\((.*)\)$', r'-\1', regex=True)  # (25.99) -> -25.99
-        s = s.replace({'': np.nan, '.': np.nan, '-': np.nan})
-        df[PRICE_COL] = pd.to_numeric(s, errors='coerce')
+    df[PRICE_COL] = np.nan
+else:
+    s = df[PRICE_COL].astype(str)
+
+    s = s.str.replace(",", ".", regex=False)
+    s = s.str.replace("\xa0", "", regex=False)
+    s = s.str.replace(" ", "", regex=False)
+    s = s.str.replace(r"[^0-9.\-()]", "", regex=True)
+    s = s.str.replace(r"^\((.*)\)$", r"-\1", regex=True)
+
+    s = s.replace({
+        "": np.nan,
+        ".": np.nan,
+        "-": np.nan
+    })
+
+    df[PRICE_COL] = pd.to_numeric(s, errors="coerce")
 
     return df
     
