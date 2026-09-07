@@ -57,7 +57,7 @@ def load_csv(path_or_buffer):
         df[c] = pd.to_numeric(s, errors='coerce')
 
     # cena (opcjonalna)
-    if PRICE_COL not in df.columns:
+if PRICE_COL not in df.columns:
     df[PRICE_COL] = np.nan
 else:
     s = df[PRICE_COL].astype(str)
@@ -76,7 +76,7 @@ else:
 
     df[PRICE_COL] = pd.to_numeric(s, errors="coerce")
 
-    return df
+return df
     
 # --- AUTOMATYCZNE WCZYTANIE DANYCH ---
 
