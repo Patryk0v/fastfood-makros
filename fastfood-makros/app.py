@@ -292,6 +292,19 @@ st.markdown(
         margin-bottom: 0.2rem;
     }
 
+    .selected-inline-name {
+        min-height: 42px;
+        border: 1px solid rgba(128,128,128,.22);
+        background: rgba(128,128,128,.08);
+        border-radius: 12px;
+        color: #8a8a8a;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        padding: 0 0.7rem;
+        line-height: 1.1;
+    }
+
     div[data-testid="stButton"] > button {
         border-radius: 12px;
         min-height: 42px;
@@ -405,29 +418,23 @@ if search_term:
             for col, product_id in zip(cols, row_ids):
                 row = df.loc[product_id]
                 qty = get_qty(product_id)
-                kcal = row["kcal_per_portion"]
-                kcal_txt = f"{kcal:.0f} kcal" if pd.notna(kcal) else "? kcal"
-
                 with col:
                     if qty <= 0:
                         if st.button(
-                            f"{row['Produkt']}\n\n{kcal_txt}",
+                            f"{row['Produkt']}",
                             key=f"search_add::{product_id}",
                             use_container_width=True,
                         ):
                             set_qty(product_id, 1.0)
                             st.rerun()
                     else:
-                        st.markdown(
-                            f'<div class="product-selected-title">{row["Produkt"]}</div>',
-                            unsafe_allow_html=True,
-                        )
-                        st.markdown(
-                            f'<div class="product-selected-meta">{kcal_txt}</div>',
-                            unsafe_allow_html=True,
-                        )
+                        name_col, minus_col, qty_col, plus_col = st.columns([3.8, 1, 1, 1])
 
-                        minus_col, qty_col, plus_col = st.columns([1, 1.2, 1])
+                        with name_col:
+                            st.markdown(
+                                f'<div class="selected-inline-name">{row["Produkt"]}</div>',
+                                unsafe_allow_html=True,
+                            )
 
                         with minus_col:
                             if st.button(
@@ -479,13 +486,12 @@ for start in range(0, len(categories), 4):
     cols = st.columns(4)
 
     for col, category in zip(cols, row_categories):
-        count = int((df["Kategoria"].astype(str) == category).sum())
         selected = st.session_state["selected_category"] == category
 
         label = (
-            f"✓ {category}\n{count} produktów"
+            f"✓ {category}"
             if selected
-            else f"{category}\n{count} produktów"
+            else f"{category}"
         )
 
         with col:
@@ -535,28 +541,10 @@ if active_category:
             row = df.loc[product_id]
 
             qty = get_qty(product_id)
-            kcal = row["kcal_per_portion"]
-            protein = row["protein_per_portion"]
-            price = row[PRICE_COL]
-
-            kcal_txt = f"{kcal:.0f} kcal" if pd.notna(kcal) else "? kcal"
-
-            secondary = []
-            if pd.notna(protein):
-                secondary.append(f"{protein:.1f} g białka")
-            if pd.notna(price):
-                secondary.append(f"{price:.2f} zł")
-
-            secondary_txt = " • ".join(secondary)
-
             with col:
                 if qty <= 0:
-                    button_label = f"{row['Produkt']}\n\n{kcal_txt}"
-                    if secondary_txt:
-                        button_label += f"\n{secondary_txt}"
-
                     if st.button(
-                        button_label,
+                        f"{row['Produkt']}",
                         key=f"product_add::{product_id}",
                         use_container_width=True,
                         help="Kliknij, aby dodać 1 porcję",
@@ -565,17 +553,14 @@ if active_category:
                         st.rerun()
 
                 else:
-                    # Po zaznaczeniu nazwa zostaje, ale jest wizualnie przygaszona.
-                    st.markdown(
-                        f'<div class="product-selected-title">{row["Produkt"]}</div>',
-                        unsafe_allow_html=True,
-                    )
-                    st.markdown(
-                        f'<div class="product-selected-meta">{kcal_txt}</div>',
-                        unsafe_allow_html=True,
-                    )
+                    # Wybrany produkt: nazwa i sterowanie ilością w jednej linii.
+                    name_col, minus_col, qty_col, plus_col = st.columns([3.8, 1, 1, 1])
 
-                    minus_col, qty_col, plus_col = st.columns([1, 1.2, 1])
+                    with name_col:
+                        st.markdown(
+                            f'<div class="selected-inline-name">{row["Produkt"]}</div>',
+                            unsafe_allow_html=True,
+                        )
 
                     with minus_col:
                         if st.button(
@@ -763,17 +748,24 @@ else:
         product_name = str(row["Produkt"])
 
         with st.container():
-            name_col, qty_col, remove_col = st.columns([4.8, 2, 1])
+            name_col, minus_col, qty_col, plus_col, remove_col = st.columns([4.6, 0.8, 1.5, 0.8, 1.2])
 
             with name_col:
                 st.markdown(
                     f"**{product_name}**  \n"
-                    f"<span class='small-muted'>"
-                    f"{row['Kategoria']} • "
-                    f"{row['kcal_per_portion']:.0f} kcal / porcja"
-                    f"</span>",
+                    f"<span class='small-muted'>{row['Kategoria']}</span>",
                     unsafe_allow_html=True,
                 )
+
+            with minus_col:
+                if st.button(
+                    "−",
+                    key=f"detail_minus::{product_id}",
+                    use_container_width=True,
+                    help="Odejmij 0,5 porcji",
+                ):
+                    set_qty(product_id, max(0.0, get_qty(product_id) - 0.5))
+                    st.rerun()
 
             with qty_col:
                 st.number_input(
@@ -786,6 +778,16 @@ else:
                     args=(product_id,),
                     label_visibility="collapsed",
                 )
+
+            with plus_col:
+                if st.button(
+                    "+",
+                    key=f"detail_plus::{product_id}",
+                    use_container_width=True,
+                    help="Dodaj 0,5 porcji",
+                ):
+                    set_qty(product_id, min(99.0, get_qty(product_id) + 0.5))
+                    st.rerun()
 
             with remove_col:
                 if st.button(
