@@ -77,7 +77,7 @@ RWS = {
 @st.cache_data
 def load_csv(path_or_buffer):
     """Wczytuje CSV i czyści kolumny liczbowe."""
-    df = pd.read_csv(path_or_buffer, sep=";", encoding="utf-8-sig")
+    df = pd.read_csv(path_or_buffer, sep=",", encoding="utf-8-sig")
 
     df.columns = (
         df.columns
